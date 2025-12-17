@@ -1,0 +1,82 @@
+name: Build Registry
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '*/agent.json'
+      - '*/icon.svg'
+      - '.github/workflows/**'
+      - 'agent.schema.json'
+  pull_request:
+    branches: [main]
+    paths:
+      - '*/agent.json'
+      - '*/icon.svg'
+      - '.github/workflows/**'
+      - 'agent.schema.json'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate and build
+        run: python .github/workflows/build_registry.py
+
+      - name: List dist
+        run: ls -la dist/
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: registry
+          path: dist/
+
+  publish:
+    name: Publish Release
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: registry
+          path: dist/
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="v$(date +%Y.%m.%d)-$(git rev-parse --short HEAD)"
+
+          # Create versioned release
+          gh release create "$VERSION" \
+            --title "Registry $VERSION" \
+            --notes "Auto-generated registry index" \
+            dist/*
+
+          # Delete old 'latest' tag and release
+          gh release delete latest --yes --cleanup-tag || true
+
+          # Create new 'latest' release
+          gh release create latest \
+            --title "Latest Registry" \
+            --notes "Points to $VERSION" \
+            --latest \
+            dist/*

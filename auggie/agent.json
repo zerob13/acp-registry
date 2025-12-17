@@ -1,0 +1,68 @@
+{
+  "id": "auggie",
+  "name": "Auggie CLI",
+  "version": "0.2.0",
+  "description": "Augment Code's powerful software agent, backed by industry-leading context engine",
+  "repository": "https://github.com/augmentcode/auggie-zed-extension",
+  "authors": ["Augment Code <support@augmentcode.com>"],
+  "license": "proprietary",
+  "icon": "./icon.svg",
+  "distribution": {
+    "binary": {
+      "darwin-aarch64": {
+        "archive": "https://registry.npmjs.org/@augmentcode/auggie/-/auggie-0.9.1.tgz",
+        "cmd": "node",
+        "args": ["./package/augment.mjs", "--acp"],
+        "env": {
+          "AUGMENT_DISABLE_AUTO_UPDATE": "1"
+        }
+      },
+      "darwin-x86_64": {
+        "archive": "https://registry.npmjs.org/@augmentcode/auggie/-/auggie-0.9.1.tgz",
+        "cmd": "node",
+        "args": ["./package/augment.mjs", "--acp"],
+        "env": {
+          "AUGMENT_DISABLE_AUTO_UPDATE": "1"
+        }
+      },
+      "linux-aarch64": {
+        "archive": "https://registry.npmjs.org/@augmentcode/auggie/-/auggie-0.9.1.tgz",
+        "cmd": "node",
+        "args": ["./package/augment.mjs", "--acp"],
+        "env": {
+          "AUGMENT_DISABLE_AUTO_UPDATE": "1"
+        }
+      },
+      "linux-x86_64": {
+        "archive": "https://registry.npmjs.org/@augmentcode/auggie/-/auggie-0.9.1.tgz",
+        "cmd": "node",
+        "args": ["./package/augment.mjs", "--acp"],
+        "env": {
+          "AUGMENT_DISABLE_AUTO_UPDATE": "1"
+        }
+      },
+      "windows-x86_64": {
+        "archive": "https://registry.npmjs.org/@augmentcode/auggie/-/auggie-0.9.1.tgz",
+        "cmd": "node",
+        "args": ["./package/augment.mjs", "--acp"],
+        "env": {
+          "AUGMENT_DISABLE_AUTO_UPDATE": "1"
+        }
+      }
+    },
+    "bunx": {
+      "package": "@augmentcode/auggie@0.9.1",
+      "args": ["--acp"],
+      "env": {
+        "AUGMENT_DISABLE_AUTO_UPDATE": "1"
+      }
+    },
+    "npx": {
+      "package": "@augmentcode/auggie@0.9.1",
+      "args": ["--acp"],
+      "env": {
+        "AUGMENT_DISABLE_AUTO_UPDATE": "1"
+      }
+    }
+  }
+}

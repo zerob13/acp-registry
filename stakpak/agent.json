@@ -1,0 +1,34 @@
+{
+  "id": "stakpak",
+  "name": "Stakpak",
+  "version": "0.1.6",
+  "description": "Open-source DevOps agent in Rust with enterprise-grade security.",
+  "repository": "https://github.com/stakpak/zed-stakpak-agent-server",
+  "authors": ["Stakpak Team <contact@stakpak.dev>"],
+  "license": "Apache-2.0",
+  "icon": "./icon.svg",
+  "distribution": {
+    "binary": {
+      "darwin-aarch64": {
+        "archive": "https://github.com/stakpak/stakpak/releases/download/v0.1.6/stakpak-aarch64-apple-darwin.zip",
+        "cmd": "./stakpak",
+        "args": ["acp"]
+      },
+      "darwin-x86_64": {
+        "archive": "https://github.com/stakpak/stakpak/releases/download/v0.1.6/stakpak-x86_64-apple-darwin.zip",
+        "cmd": "./stakpak",
+        "args": ["acp"]
+      },
+      "linux-x86_64": {
+        "archive": "https://github.com/stakpak/stakpak/releases/download/v0.1.6/stakpak-x86_64-unknown-linux-gnu.zip",
+        "cmd": "./stakpak",
+        "args": ["acp"]
+      },
+      "windows-x86_64": {
+        "archive": "https://github.com/stakpak/stakpak/releases/download/v0.1.6/stakpak-x86_64-pc-windows-msvc.zip",
+        "cmd": "./stakpak.exe",
+        "args": ["acp"]
+      }
+    }
+  }
+}
