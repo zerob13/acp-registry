@@ -63,6 +63,9 @@ jobs:
         run: |
           VERSION="v$(date +%Y.%m.%d)-$(git rev-parse --short HEAD)"
 
+          # Delete existing versioned release if it exists (for re-runs)
+          gh release delete "$VERSION" --yes --cleanup-tag || true
+
           # Create versioned release
           gh release create "$VERSION" \
             --title "Registry $VERSION" \
