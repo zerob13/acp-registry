@@ -131,14 +131,74 @@ To update your agent or extension's version or distribution URLs:
 
 ## Validation
 
-All submissions are validated against the [JSON Schema](agent.schema.json). Additionally, **all distribution URLs must be accessible** - the CI validates that:
+All submissions are automatically validated by CI. Here's what gets checked:
 
-- Binary archive URLs return HTTP 200
-- npm packages exist on registry.npmjs.org
-- PyPI packages exist on pypi.org
+### Schema Validation
 
-Run validation locally:
+Entries are validated against the [JSON Schema](agent.schema.json).
+
+### ID Validation
+
+- Must be lowercase letters, digits, and hyphens only
+- Must start with a letter
+- Must match the directory name
+- Must be unique across all agents and extensions
+
+### Version Validation
+
+- Must be semantic version format (`x.y.z`, e.g., `1.0.0`)
+- All version parts must be numeric
+
+### Distribution Validation
+
+**Structure:**
+- At least one distribution method required (`binary`, `npx`, or `uvx`)
+- Binary distributions require `archive` and `cmd` fields per platform
+- Package distributions (`npx`, `uvx`) require `package` field
+
+**Platforms** (for binary):
+- `darwin-aarch64`, `darwin-x86_64`
+- `linux-aarch64`, `linux-x86_64`
+- `windows-aarch64`, `windows-x86_64`
+
+**Version matching:**
+- Distribution versions must match the entry's `version` field
+- Binary URLs containing version (e.g., `/download/v1.0.0/`) are checked
+- npm package versions (`@scope/pkg@1.0.0`) are checked
+- PyPI package versions (`pkg==1.0.0` or `pkg@1.0.0`) are checked
+
+**No `latest` allowed:**
+- Binary URLs must not contain `/latest/`
+- npm packages must not use `@latest`
+- PyPI packages must not use `@latest`
+
+### URL Accessibility
+
+All distribution URLs must be accessible:
+
+- Binary archive URLs must return HTTP 200
+- npm packages must exist on registry.npmjs.org
+- PyPI packages must exist on pypi.org
+
+### Icon Validation
+
+If an `icon.svg` is provided:
+
+- Must be exactly **16x16** pixels (via `width`/`height` attributes or `viewBox`)
+- Must be **square** (width equals height)
+- Must be **monochrome** using `currentColor`:
+  - `fill` attributes: only `currentColor`, `none`, or `inherit` allowed
+  - `stroke` attributes: only `currentColor`, `none`, or `inherit` allowed
+  - No hardcoded colors (`#FF0000`, `red`, `rgb(...)`, etc.)
+
+### Run Validation Locally
 
 ```bash
 uv run --with jsonschema .github/workflows/build_registry.py
+```
+
+To skip URL accessibility checks (useful for testing before publishing):
+
+```bash
+SKIP_URL_VALIDATION=1 uv run --with jsonschema .github/workflows/build_registry.py
 ```
