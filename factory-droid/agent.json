@@ -1,14 +1,20 @@
 {
   "id": "factory-droid",
   "name": "Factory Droid",
-  "version": "0.57.10",
+  "version": "0.57.11",
   "description": "Factory Droid - AI coding agent powered by Factory AI",
-  "authors": ["Factory AI"],
+  "authors": [
+    "Factory AI"
+  ],
   "license": "proprietary",
   "distribution": {
     "npx": {
-      "package": "droid@0.57.10",
-      "args": ["exec", "--output-format", "acp"],
+      "package": "droid@0.57.11",
+      "args": [
+        "exec",
+        "--output-format",
+        "acp"
+      ],
       "env": {
         "DROID_DISABLE_AUTO_UPDATE": "true",
         "FACTORY_DROID_AUTO_UPDATE_ENABLED": "false"
