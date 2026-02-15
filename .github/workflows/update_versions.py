@@ -159,9 +159,27 @@ def extract_pypi_package_name(package_spec: str) -> str:
     return re.split(r"[<>=!@]", package_spec)[0]
 
 
+def load_quarantine(registry_dir: Path) -> dict[str, str]:
+    """Load quarantine list from registry directory.
+
+    Returns:
+        Dict mapping agent_id to quarantine reason.
+    """
+    quarantine_path = registry_dir / "quarantine.json"
+    if not quarantine_path.exists():
+        return {}
+    try:
+        with open(quarantine_path) as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError) as e:
+        print(f"Warning: Could not read {quarantine_path}: {e}", file=sys.stderr)
+        return {}
+
+
 def find_all_agents(registry_dir: Path) -> list[tuple[Path, dict]]:
-    """Find all agent.json files in the registry."""
+    """Find all agent.json files in the registry, excluding quarantined ones."""
     agents = []
+    quarantine = load_quarantine(registry_dir)
 
     for scan_dir in AGENT_DIRS:
         base_path = registry_dir / scan_dir if scan_dir != "." else registry_dir
@@ -182,9 +200,20 @@ def find_all_agents(registry_dir: Path) -> list[tuple[Path, dict]]:
                 try:
                     with open(agent_json) as f:
                         agent_data = json.load(f)
-                    agents.append((agent_json, agent_data))
                 except (json.JSONDecodeError, OSError) as e:
                     print(f"Warning: Could not read {agent_json}: {e}", file=sys.stderr)
+                    continue
+
+                agent_id = agent_data.get("id", entry_dir.name)
+                if agent_id in quarantine:
+                    print(f"  ⊘ Quarantined {agent_id}: {quarantine[agent_id]}", file=sys.stderr)
+                    continue
+
+                agents.append((agent_json, agent_data))
+
+    if quarantine:
+        print(f"  ({len(quarantine)} agent(s) quarantined)", file=sys.stderr)
+        print(file=sys.stderr)
 
     return agents
 
