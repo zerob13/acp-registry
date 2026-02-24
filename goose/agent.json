@@ -1,8 +1,8 @@
 {
   "id": "goose",
-  "name": "Goose",
+  "name": "goose",
   "version": "1.25.0",
-  "description": "Block's open-source AI developer agent",
+  "description": "A local, extensible, open source AI agent that automates engineering tasks",
   "repository": "https://github.com/block/goose",
   "authors": [
     "Block"
@@ -39,8 +39,8 @@
         ]
       },
       "windows-x86_64": {
-        "archive": "https://github.com/block/goose/releases/download/v1.25.0/goose-x86_64-pc-windows-gnu.zip",
-        "cmd": "./goose.exe",
+        "archive": "https://github.com/block/goose/releases/download/v1.25.0/goose-x86_64-pc-windows-msvc.zip",
+        "cmd": "goose.exe",
         "args": [
           "acp"
         ]
