@@ -41,7 +41,7 @@ PLATFORM_MAP = {
 DEFAULT_TIMEOUT = 10  # seconds
 STARTUP_GRACE = 2  # seconds to wait before checking if process is alive
 DEFAULT_SANDBOX_DIR = ".sandbox"
-DEFAULT_AUTH_TIMEOUT = 60  # seconds for ACP handshake (includes npx download time)
+DEFAULT_AUTH_TIMEOUT = 120  # seconds for ACP handshake (includes npx download time)
 
 
 class Result(NamedTuple):
@@ -434,6 +434,19 @@ def build_agent_command(
     return cmd, cwd, env
 
 
+def _print_auth_diagnostics(result) -> None:
+    """Print diagnostic details from a failed AuthCheckResult."""
+    if result.duration_seconds is not None:
+        print(f"      Duration: {result.duration_seconds:.1f}s")
+    if result.process_exit_code is not None:
+        print(f"      Process exit code: {result.process_exit_code}")
+    if result.stderr_tail:
+        lines = result.stderr_tail.rstrip().split("\n")
+        # Show last 20 lines max
+        for line in lines[-20:]:
+            print(f"      stderr: {line}")
+
+
 def verify_auth(
     agent: dict,
     dist_type: str,
@@ -489,8 +502,20 @@ def verify_auth(
     if result.success:
         methods_info = ", ".join(f"{m.id}({m.type})" for m in result.auth_methods if m.type)
         return Result(agent_id, dist_type, True, f"Auth OK: {methods_info}")
-    else:
-        return Result(agent_id, dist_type, False, result.error or "Auth check failed")
+
+    # Print diagnostics for failed attempt
+    _print_auth_diagnostics(result)
+
+    # Retry once for transient failures
+    print("    Retrying...")
+    result = run_auth_check(cmd, cwd, env, auth_timeout)
+
+    if result.success:
+        methods_info = ", ".join(f"{m.id}({m.type})" for m in result.auth_methods if m.type)
+        return Result(agent_id, dist_type, True, f"Auth OK (retry): {methods_info}")
+
+    _print_auth_diagnostics(result)
+    return Result(agent_id, dist_type, False, result.error or "Auth check failed")
 
 
 def verify_agent(
@@ -619,7 +644,7 @@ def main():
         epilog="""
 Examples:
   %(prog)s                          # Verify all agents (basic launch test)
-  %(prog)s -a claude,gemini         # Verify specific agents (comma-separated)
+  %(prog)s -a claude-acp,gemini     # Verify specific agents (comma-separated)
   %(prog)s -t npx                   # Verify only npx distributions
   %(prog)s --clean                  # Clean sandboxes before running
   %(prog)s --clean-all              # Remove all sandboxes and exit
